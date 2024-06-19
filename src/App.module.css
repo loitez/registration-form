@@ -1,0 +1,69 @@
+.formWrapper {
+    width: 400px;
+    margin-top: 40px;
+    padding: 20px 20px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    display: grid;
+    gap: 15px;
+    grid-template-columns: 1fr;
+    box-shadow: 0 0 9px 2px #957cbf;
+}
+h1 {
+    margin: 0;
+    text-align: center;
+    color: #957cbf;
+}
+form {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+.input {
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 15px;
+    outline: none;
+    border: 1px solid #957cbf;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+}
+input:hover {
+    background-color: #f2eafd;
+}
+input:focus {
+    box-shadow: 0 0 0 1px #957cbf;
+    background-color: #fff;
+}
+.submitButton {
+    margin-top: 10px;
+    outline: none;
+    font-size: inherit;
+    font-family: inherit;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 15px;
+    padding: 10px;
+    background-color: #957cbf;
+}
+.submitButton:hover {
+    background-color: #a38bcd;
+    box-shadow: 0 0 4px 0 #957cbf;
+}
+.submitButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.submitButton:disabled:hover {
+    background-color: #957cbf;
+    box-shadow: none;
+}
+.submitButton:focus {
+    background-color: #a38bcd;
+    box-shadow: 0 0 4px 0 #957cbf;
+}
+.errorMessage {
+    color: red;
+    margin-top: 0;
+}
