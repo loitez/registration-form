@@ -1,94 +1,70 @@
 import './App.css';
 import styles from './App.module.css'
-import {useState, useRef} from 'react'
+import {useRef} from 'react'
+import {useForm} from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 export const App = () => {
-
     const submitButtonRef = useRef(null)
 
-    const [emailError, setEmailError] = useState(null)
-    const [passwordError, setPasswordError] = useState(null)
-    const [passwordRepeatError, setPasswordRepeatError] = useState(null)
+    const schema = yup.object()
+        .shape({
+        email: yup
+            .string()
+            .required('Обязательное поле')
+            .matches(/.+@.+\..+/i, 'Введите корректный email'),
+        password: yup
+            .string()
+            .required('Обязательное поле')
+            .min(8, 'Минимальная длина пароля - 8 символов'),
 
-    const initialFormDataState = {
-        email: '',
-        password: '',
-        repeatPassword: ''
+        repeatPassword: yup
+            .string()
+            .required('Обязательное поле')
+            .oneOf([yup.ref('password'), null], 'Пароли должны совпадать')
+    })
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        defaultValues: {
+            email: '',
+            password: '',
+            repeatPassword: ''
+        },
+        resolver: yupResolver(schema)
+    })
+
+    const emailError = errors.email?.message
+    const passwordError = errors.password?.message
+    const passwordRepeatError = errors.repeatPassword?.message
+
+    let hasError = !!(emailError || passwordError || passwordRepeatError)
+
+
+    const sendFormData = (formData) => {
+        console.log(formData)
     }
 
-    let hasError = !!(passwordError || emailError || passwordRepeatError)
-
-    const [formData, setFormData] = useState(initialFormDataState)
-
-    const onSubmit = (e) => {
-        e.preventDefault()
-        if (formData.password && formData.email && formData.repeatPassword) {
-            console.log(formData)
-            submitButtonRef.current.blur()
-            setFormData(initialFormDataState)
-        } else {
-            for (let item in formData) {
-                if (formData[item] === '') {
-                    let error = 'Заполните поле'
-                    switch (item) {
-                        case 'email':
-                            setEmailError(error)
-                            break
-                        case 'password':
-                            setPasswordError(error)
-                            break
-                        case 'repeatPassword':
-                            setPasswordRepeatError(error)
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    const onInputChange = ({target}) => {
-        setFormData({...formData, [target.name] : target.value})
-        let error =  null;
-        switch (target.name) {
-            case 'email':
-                if (!/.+@.+\..+/i.test(target.value) && target.value.length > 0) {
-                    error = 'Неверный формат e-mail'
-                }
-                setEmailError(error)
-                break
-            case 'password':
-                setPasswordError('')
-                break
-            case 'repeatPassword':
-                if (target.value === formData.password) {
-                    submitButtonRef.current.focus()
-                }
-
-        }
-    }
-
-    const onPasswordBlur = ({target}) => {
-        setFormData({...formData, [target.name] : target.value})
-        let error =  null;
-        if (target.value !== formData.password && target.value.length > 0) {
-            error = 'Пароли не совпадают'
-        }
-        setPasswordRepeatError(error)
-    }
 
   return (
       <div className={styles.formWrapper}>
         <h1>Регистрация</h1>
-          <form onSubmit={onSubmit}>
-              <input type="email" name="email" className={styles.input} onChange={onInputChange} placeholder='Email' value={formData.email}/>
+          <form onSubmit={handleSubmit(sendFormData)}>
+              <input type="email" name="email" className={styles.input} placeholder='Email' {...register('email')} />
               {emailError && <p className={styles.errorMessage}>{emailError}</p>}
-              <input type="password" name="password" className={styles.input} onChange={onInputChange} placeholder='Пароль' value={formData.password}/>
+              <input type="password" name="password" className={styles.input} placeholder='Пароль' {...register('password')}/>
               {passwordError && <p className={styles.errorMessage}>{passwordError}</p>}
-              <input type="password" name="repeatPassword" className={styles.input} onChange={onInputChange} onBlur={onPasswordBlur} placeholder='Повторите пароль' value={formData.repeatPassword}/>
+              <input type="password" name="repeatPassword" className={styles.input} placeholder='Повторите пароль' {...register('repeatPassword')}/>
               {passwordRepeatError && <p className={styles.errorMessage}>{passwordRepeatError}</p>}
-              <button type="submit" className={styles.submitButton} disabled={hasError} ref={submitButtonRef}>Зарегистрироваться</button>
+              <button type="submit" className={styles.submitButton} ref={submitButtonRef} disabled={hasError}>Зарегистрироваться</button>
           </form>
       </div>
   )
 }
+
+
+// auto-focus on submit btn when validation is ok (hasError is false? other fields have values?)
